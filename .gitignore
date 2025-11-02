@@ -7,6 +7,10 @@
 *.dylib
 *.pyc
 *~
+compile_commands.json
+/cosine_similarity_test/build/
+/cosine_similarity_test/.cache/
+/cosine_similarity_test/compile_commands.json
 /build/
 /config.*
 /aclocal.m4
