@@ -30,6 +30,14 @@ namespace gpu {
 // T: the type we are doing the math in (e.g., float, half)
 // TVec: the potentially vectorized type we are loading in (e.g.,
 // float4, half2)
+// 输入：(batch x dim) 批次 × 维度
+// 输出：(batch norm) 批次的范数
+// 该实现基于以下假设：维度大小不会太大
+//（约 <10k），因为如果维度过大，单个 block 处理时并行度不足。
+// 同时假设每个向量足够大（>64），因为单个 block 会同时处理
+// 多行向量的范数计算。
+// T: 我们进行数学计算时使用的类型（例如 float、half）
+// TVec: 我们加载数据时可能使用的向量化类型（例如 float4、half2）
 template <typename T, typename TVec, int RowTileSize, bool NormSquared>
 __global__ void l2NormRowMajor(
         Tensor<TVec, 2, true> input,
