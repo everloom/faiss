@@ -43,9 +43,20 @@ add_executable(main_test
     gpu_normalize.cu
 )
 
+# 独立的 Top-K 测试程序
+add_executable(test_topk
+    test_topk.cpp
+    topk_kernel.cu
+)
+
 # 设置 CUDA 架构（根据你的 GPU 修改）
 set_target_properties(main_test PROPERTIES 
     CUDA_ARCHITECTURES "75;80;86;89;90"  # 支持 Turing, Ampere, Ada, Hopper
+    CUDA_SEPARABLE_COMPILATION ON
+)
+
+set_target_properties(test_topk PROPERTIES 
+    CUDA_ARCHITECTURES "75;80;86;89;90"
     CUDA_SEPARABLE_COMPILATION ON
 )
 
@@ -60,9 +71,19 @@ target_link_libraries(main_test PRIVATE
     dl
 )
 
+# test_topk 不需要 Faiss 库（独立实现）
+target_link_libraries(test_topk PRIVATE
+    CUDA::cudart
+)
+
 # 编译选项
 target_compile_options(main_test PRIVATE
     $<$<COMPILE_LANGUAGE:CXX>:-O3 -march=native -fopenmp>
+    $<$<COMPILE_LANGUAGE:CUDA>:-O3 --expt-relaxed-constexpr --expt-extended-lambda>
+)
+
+target_compile_options(test_topk PRIVATE
+    $<$<COMPILE_LANGUAGE:CXX>:-O3 -march=native>
     $<$<COMPILE_LANGUAGE:CUDA>:-O3 --expt-relaxed-constexpr --expt-extended-lambda>
 )
 
